@@ -51,7 +51,7 @@ Follow these steps to run the project locally on your machine.
 ### 1. Clone the repository
 ```bash
 git clone <GITHUB_REPO_URL>
-cd productividad-app
+cd productivity-app
 ```
 
 ### 2. Install Dependencies
@@ -91,7 +91,7 @@ npm run dev
 ## 📂 Project Structure
 
 ```text
-productividad-app/
+productivity-app/
 ├── backend/                # Node.js/Express Server
 │   ├── config/             # DB Connection
 │   ├── controllers/        # Route Logic

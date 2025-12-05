@@ -14,7 +14,10 @@ const taskSchema = new Schema({
     dueDate: { type: Date, default: null },
     order: { type: Number, required: true },
     comments: [commentSchema]
-}, { _id: true });
+}, { 
+    _id: true,
+    timestamps: true 
+});
 
 const listSchema = new Schema({
     title: { type: String, required: true, trim: true },
@@ -30,10 +33,10 @@ const memberSchema = new Schema({
 const boardSchema = new Schema({
     title: { type: String, required: true, trim: true },
     owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    members: [memberSchema], 
-    lists: [listSchema] 
+    members: [memberSchema],
+    lists: [listSchema]
 }, {
-    timestamps: true 
+    timestamps: true
 });
 
 module.exports = mongoose.model('Board', boardSchema);

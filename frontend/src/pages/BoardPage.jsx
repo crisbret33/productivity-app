@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from '../api/axios';
 import List from '../components/List';
+import TaskModal from '../components/TaskModal';
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 
 const BoardPage = () => {
@@ -9,6 +10,8 @@ const BoardPage = () => {
     const [board, setBoard] = useState(null);
     const [newListTitle, setNewListTitle] = useState('');
     const [loading, setLoading] = useState(true);
+    const [selectedTask, setSelectedTask] = useState(null);
+    const [selectedListId, setSelectedListId] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -50,14 +53,44 @@ const BoardPage = () => {
         }
     };
 
-    const handleDeleteTask = async (listId, taskId) => {
-        if (!window.confirm('Delete this task?')) return;
+    const handleUpdateTask = async (taskId, updatedFields) => {
         try {
-            const { data } = await axios.delete(`/boards/${board._id}/lists/${listId}/tasks/${taskId}`);
+            const { data } = await axios.put(
+                `/boards/${board._id}/lists/${selectedListId}/tasks/${taskId}`, 
+                updatedFields
+            );
             setBoard(data);
+        } catch (error) {
+            alert('Error updating task');
+        }
+    };
+
+    const handleDeleteTaskFromModal = async (taskId) => {
+        try {
+            const { data } = await axios.delete(`/boards/${board._id}/lists/${selectedListId}/tasks/${taskId}`);
+            setBoard(data);
+            setSelectedTask(null);
         } catch (error) {
             alert('Error deleting task');
         }
+    };
+
+    const handleMoveTask = async (taskId, currentListId, newListId) => {
+        try {
+            const { data } = await axios.put(`/boards/${board._id}/tasks/${taskId}/move`, {
+                currentListId,
+                newListId
+            });
+            setBoard(data);
+            setSelectedTask(null);
+        } catch (error) {
+            alert('Error moving task');
+        }
+    };
+
+    const onTaskClick = (task, listId) => {
+        setSelectedTask(task);
+        setSelectedListId(listId);
     };
 
     const refreshBoard = (updatedBoardData) => {
@@ -126,6 +159,7 @@ const BoardPage = () => {
     return (
         <DragDropContext onDragEnd={onDragEnd}>
             <div style={{ height: '100vh', background: '#0079bf', display: 'flex', flexDirection: 'column' }}>
+                
                 <div style={{ padding: '15px', background: 'rgba(0,0,0,0.15)', color: 'white', display: 'flex', alignItems: 'center', gap: '20px' }}>
                     <button onClick={() => navigate('/dashboard')} style={{ background: 'rgba(255,255,255,0.3)', border: 'none', color: 'white', cursor: 'pointer', padding: '5px 10px', borderRadius: '4px' }}>
                         ← Back
@@ -153,8 +187,8 @@ const BoardPage = () => {
                                     boardId={id} 
                                     index={index}
                                     onUpdate={refreshBoard}
-                                    onDeleteTask={handleDeleteTask}
                                     onDeleteList={handleDeleteList}
+                                    onTaskClick={onTaskClick}
                                 />
                             ))}
                             {provided.placeholder}
@@ -176,6 +210,20 @@ const BoardPage = () => {
                         </div>
                     )}
                 </Droppable>
+
+                {selectedTask && (
+                    <TaskModal 
+                        isOpen={!!selectedTask}
+                        onClose={() => setSelectedTask(null)}
+                        task={selectedTask}
+                        listName={board.lists.find(l => l._id === selectedListId)?.title}
+                        onSave={handleUpdateTask}
+                        onDelete={handleDeleteTaskFromModal}
+                        allLists={board.lists}
+                        currentListId={selectedListId}
+                        onMove={handleMoveTask}
+                    />
+                )}
             </div>
         </DragDropContext>
     );
