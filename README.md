@@ -1,53 +1,121 @@
-# 🚀 Plataforma de Productividad
+# KanbanFlow - Full Stack Project Management Tool
 
-Una aplicación web Full-Stack para la gestión de tareas y proyectos, inspirada en Trello. Permite a los usuarios crear tableros, listas y gestionar su flujo de trabajo de manera visual.
+A robust Kanban-style productivity application (inspired by Trello) built with the **MERN Stack** (MongoDB, Express, React, Node.js).
 
-## Tecnologías Usadas (Stack MERN)
+This project features advanced capabilities such as fluid **Drag & Drop**, secure authentication, real-time UI updates (Optimistic UI), and a responsive modern design.
 
-* **Frontend:** React (Vite), React Router, Axios.
-* **Backend:** Node.js, Express.
-* **Base de Datos:** MongoDB (Atlas).
-* **Autenticación:** JSON Web Tokens (JWT).
-* **Estilos:** CSS Modules / Styled Components (en progreso).
+## Key Features
 
-## Funcionalidades Implementadas
+### Authentication & Security
+* **User System:** Complete user registration and login.
+* **Security:** Passwords hashed with `bcryptjs` and sessions managed via **JWT (JSON Web Tokens)**.
+* **Protected Routes:** Middleware on the Backend and route guards on the Frontend.
 
-* ✅ **Autenticación Completa:** Registro e Inicio de Sesión de usuarios seguros.
-* ✅ **Protección de Rutas:** Middleware para proteger recursos privados.
-* ✅ **Dashboard:** Vista general de los proyectos del usuario.
-* ✅ **Gestión de Tableros:** Creación y visualización de tableros dinámicos.
-* ✅ **Listas Dinámicas:** Capacidad de añadir columnas (listas) dentro de los tableros.
-* ✅ **Conexión API:** Arquitectura RESTful conectando cliente y servidor.
+### Drag & Drop System
+* **Boards:** Reorder your projects on the main Dashboard.
+* **Lists:** Move columns horizontally to organize workflow stages.
+* **Tasks:** Drag cards between columns or reorder them within a list.
+* *Tech:* Powered by `@hello-pangea/dnd` for a native and smooth experience.
 
-## Instalación y Puesta en Marcha
+### 🛠️ Board Management
+* **Smart Creation:** Modal to create boards with custom initial columns.
+* **CRUD Operations:** Full capability to Create, Read, Update (Reorder), and Delete Boards, Lists, and Tasks.
+* **Modern UX/UI:**
+    * Clean interface using *Inter* typography.
+    * Hover-only action buttons to keep the UI clutter-free.
+    * Visual feedback during drag operations.
 
-Si quieres ejecutar este proyecto en local:
+---
 
-1.  **Clonar el repositorio:**
-    ```bash
-    git clone <TU_URL_DE_GITHUB>
-    ```
+## Tech Stack
 
-2.  **Instalar dependencias:**
-    Desde la raíz del proyecto, ejecutamos la instalación (que instalará también backend y frontend si está configurado, o hazlo manual):
-    ```bash
-    npm install
-    cd backend && npm install
-    cd ../frontend && npm install
-    ```
+### Frontend (Client)
+* **React:** UI Library (initialized with Vite).
+* **React Router DOM:** SPA Navigation.
+* **Axios:** HTTP Client with interceptors for automatic Token handling.
+* **@hello-pangea/dnd:** Modern library for Drag & Drop logic.
+* **CSS3:** Custom styling, transitions, and responsive layout.
 
-3.  **Configurar Variables de Entorno:**
-    Crea un archivo `.env` en la carpeta `backend` con las siguientes variables:
-    ```env
-    PORT=5001
-    MONGO_URI=tu_cadena_de_conexion_mongodb
-    JWT_SECRET=tu_palabra_secreta
-    ```
+### Backend (Server)
+* **Node.js & Express:** Server runtime and framework.
+* **MongoDB & Mongoose:** NoSQL Database and Object Data Modeling (ODM).
+* **JWT & Bcrypt:** Authentication and Security.
+* **Cors & Dotenv:** Environment configuration and cross-origin resource sharing.
 
-4.  **Ejecutar el proyecto:**
-    Desde la raíz:
-    ```bash
-    npm run dev
-    ```
-    Esto lanzará tanto el servidor (Backend) como el cliente (Frontend) simultáneamente.
+---
+
+## Getting Started
+
+Follow these steps to run the project locally on your machine.
+
+### 1. Clone the repository
+```bash
+git clone <GITHUB_REPO_URL>
+cd productividad-app
+```
+
+### 2. Install Dependencies
+We have configured a master script to install dependencies for the root, backend, and frontend with a single command:
+```bash
+npm run setup
+```
+*(If this fails, you can install them manually by running `npm install` inside the root, backend, and frontend folders).*
+
+### 3. Environment Variables
+Create a `.env` file inside the `/backend` folder with the following keys:
+
+```env
+PORT=5001
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_super_secret_key
+NODE_ENV=development
+```
+
+*(Optional) Create a `.env` file in `/frontend` if you need to specify the API URL:*
+```env
+VITE_API_URL=http://localhost:5001/api
+```
+
+### 4. Run the Application
+Start both the Backend (Server) and Frontend (Client) simultaneously from the root folder:
+
+```bash
+npm run dev
+```
+
+* **Frontend:** http://localhost:5173
+* **Backend:** http://localhost:5001
+
+---
+
+## 📂 Project Structure
+
+```text
+productividad-app/
+├── backend/                # Node.js/Express Server
+│   ├── config/             # DB Connection
+│   ├── controllers/        # Route Logic
+│   ├── middlewares/        # Auth Middleware (JWT)
+│   ├── models/             # Mongoose Schemas (User, Board)
+│   ├── routes/             # API Endpoints
+│   └── server.js           # Entry Point
+│
+├── frontend/               # React Client (Vite)
+│   ├── src/
+│   │   ├── api/            # Axios Setup
+│   │   ├── components/     # UI Components (List, Task, Modal...)
+│   │   ├── pages/          # Views (Login, Dashboard, Board)
+│   │   └── App.jsx         # Main Router
+│   └── index.css           # Global Styles
+│
+└── package.json            # Root configuration
+```
+
+---
+
+## 🔮 Roadmap / Future Improvements
+
+* [ ] Inline editing for Task and List titles.
+* [ ] Assign users to specific tasks (Collaboration).
+* [ ] Due dates and color labels.
 

@@ -9,7 +9,6 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
-        {/* Los dos puntos :id significan que eso cambia dinámicamente */}
         <Route path="/board/:id" element={<BoardPage />} /> 
         <Route path="/" element={<LoginPage />} />
       </Routes>
