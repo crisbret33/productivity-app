@@ -1,0 +1,18 @@
+# Dependencias
+node_modules/
+*/node_modules/
+
+# Variables de Entorno
+.env
+backend/.env
+frontend/.env
+
+# Archivos de sistema
+.DS_Store
+
+# Logs de npm
+npm-debug.log*
+
+# Build de producción
+dist/
+build/

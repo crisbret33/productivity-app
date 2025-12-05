@@ -1,0 +1,17 @@
+{
+  "name": "productividad-app",
+  "version": "1.0.0",
+  "description": "App completa MERN",
+  "main": "index.js",
+  "scripts": {
+    "server": "cd backend && nodemon server.js",
+    "client": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
