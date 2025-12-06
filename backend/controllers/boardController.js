@@ -109,7 +109,7 @@ const addList = asyncHandler(async (req, res) => {
 });
 
 const addTask = asyncHandler(async (req, res) => {
-    const { title } = req.body;
+    const { title, description, dueDate, labels } = req.body;
     const { boardId, listId } = req.params;
 
     if (!title) {
@@ -131,18 +131,25 @@ const addTask = asyncHandler(async (req, res) => {
 
     const newTask = {
         title,
+        description: description || '',
+        dueDate: dueDate || null,
+        labels: labels || [],
         order: list.tasks.length,
-        comments: []
+        comments: [],
+        subtaskIds: [],
+        parentTaskId: null
     };
 
     list.tasks.push(newTask);
+    
     await board.save();
+
     res.status(200).json(board);
 });
 
 const updateTask = asyncHandler(async (req, res) => {
     const { boardId, listId, taskId } = req.params;
-    const { title, description, dueDate } = req.body;
+    const { title, description, dueDate, labels, subtasks } = req.body;
 
     const board = await Board.findById(boardId);
     if (!board) { res.status(404); throw new Error('Board not found'); }
@@ -156,6 +163,8 @@ const updateTask = asyncHandler(async (req, res) => {
     if (title !== undefined) task.title = title;
     if (description !== undefined) task.description = description;
     if (dueDate !== undefined) task.dueDate = dueDate;
+    if (labels !== undefined) task.labels = labels;
+    if (subtasks !== undefined) task.subtasks = subtasks;
 
     await board.save();
     res.status(200).json(board);
@@ -231,14 +240,12 @@ const moveTask = asyncHandler(async (req, res) => {
     const board = await Board.findById(boardId);
     if (!board) { res.status(404); throw new Error('Board not found'); }
 
-    // Verificar permisos...
     if (board.owner.toString() !== req.user._id.toString() && 
         !board.members.some(m => m.userId.toString() === req.user._id.toString())) {
         res.status(401);
         throw new Error('Not authorized');
     }
 
-    // 1. Encontrar listas
     const sourceList = board.lists.id(currentListId);
     const targetList = board.lists.id(newListId);
 
@@ -247,25 +254,65 @@ const moveTask = asyncHandler(async (req, res) => {
         throw new Error('List not found');
     }
 
-    // 2. Encontrar la tarea y sacarla de la lista origen
     const task = sourceList.tasks.id(taskId);
     if (!task) { res.status(404); throw new Error('Task not found'); }
 
-    // Clonamos la tarea para no perder datos al borrarla
     const taskData = task.toObject(); 
     
-    // La borramos del origen
     sourceList.tasks.pull(taskId);
 
-    // 3. Meterla en el destino (al final)
     targetList.tasks.push(taskData);
 
     await board.save();
     res.status(200).json(board);
 });
 
+const createLinkedSubtask = asyncHandler(async (req, res) => {
+    const { boardId, parentId } = req.params;
+    const { title, targetListId } = req.body;
+
+    console.log(`Intentando crear subtarea. Padre: ${parentId}, Lista destino: ${targetListId}`);
+
+    const board = await Board.findById(boardId);
+    if (!board) { res.status(404); throw new Error('Board not found'); }
+
+    let parentTask = null;
+    for (const list of board.lists) {
+        const t = list.tasks.id(parentId);
+        if (t) {
+            parentTask = t;
+            break;
+        }
+    }
+    if (!parentTask) { res.status(404); throw new Error('Parent Task not found'); }
+
+    const targetList = board.lists.id(targetListId);
+    if (!targetList) { res.status(404); throw new Error('Target List not found'); }
+
+    const newChildTask = {
+        title,
+        order: targetList.tasks.length,
+        parentTaskId: parentId.toString(),
+        subtaskIds: [],
+        comments: []
+    };
+
+    console.log("Objeto a guardar:", newChildTask);
+
+    targetList.tasks.push(newChildTask);
+    
+    const createdChild = targetList.tasks[targetList.tasks.length - 1];
+
+    parentTask.subtaskIds.push(createdChild._id.toString());
+
+    await board.save();
+    
+    console.log("¡Guardado con éxito!");
+    res.status(200).json(board);
+});
+
 module.exports = {
     getBoards, createBoard, getBoard, addList, addTask, updateTask,
     reorderTasks, deleteTask, reorderLists, deleteList, deleteBoard, 
-    reorderMyBoards, moveTask,
+    reorderMyBoards, moveTask, createLinkedSubtask
 };

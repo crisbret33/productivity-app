@@ -53,6 +53,34 @@ const BoardPage = () => {
         }
     };
 
+    const handleOpenAddModal = (listId) => {
+        setSelectedListId(listId);
+        setSelectedTask({ 
+            _id: 'new', 
+            title: '', 
+            description: '', 
+            labels: [], 
+            subtasks: [],
+            dueDate: null
+        });
+    };
+
+    const handleCreateTaskFromModal = async (dummyId, taskData) => {
+        try {
+            const { data } = await axios.post(`/boards/${board._id}/lists/${selectedListId}/tasks`, {
+                title: taskData.title,
+                description: taskData.description,
+                dueDate: taskData.dueDate,
+                labels: taskData.labels,
+                subtasks: taskData.subtasks
+            });
+            setBoard(data);
+            setSelectedTask(null);
+        } catch (error) {
+            alert('Error creating task');
+        }
+    };
+
     const handleUpdateTask = async (taskId, updatedFields) => {
         try {
             const { data } = await axios.put(
@@ -60,6 +88,15 @@ const BoardPage = () => {
                 updatedFields
             );
             setBoard(data);
+            
+            if (selectedTask && selectedTask._id === taskId) {
+                let updatedTask = null;
+                for (const list of data.lists) {
+                    const found = list.tasks.find(t => t._id === taskId);
+                    if (found) { updatedTask = found; break; }
+                }
+                if (updatedTask) setSelectedTask(updatedTask);
+            }
         } catch (error) {
             alert('Error updating task');
         }
@@ -86,6 +123,31 @@ const BoardPage = () => {
         } catch (error) {
             alert('Error moving task');
         }
+    };
+
+    const handleCreateLinkedSubtask = async (title, targetListId) => {
+        try {
+            const { data } = await axios.post(`/boards/${board._id}/tasks/${selectedTask._id}/subtasks`, {
+                title,
+                targetListId
+            });
+            setBoard(data);
+            
+            let updatedParent = null;
+            for (const list of data.lists) {
+                const found = list.tasks.find(t => t._id === selectedTask._id);
+                if (found) { updatedParent = found; break; }
+            }
+            if (updatedParent) setSelectedTask(updatedParent);
+
+        } catch (error) {
+            alert('Error creating linked subtask');
+        }
+    };
+
+    const handleTaskLinkClick = (task, listId) => {
+        setSelectedTask(task);
+        setSelectedListId(listId);
     };
 
     const onTaskClick = (task, listId) => {
@@ -189,6 +251,8 @@ const BoardPage = () => {
                                     onUpdate={refreshBoard}
                                     onDeleteList={handleDeleteList}
                                     onTaskClick={onTaskClick}
+                                    onAddClick={handleOpenAddModal}
+                                    allLists={board.lists}
                                 />
                             ))}
                             {provided.placeholder}
@@ -217,11 +281,13 @@ const BoardPage = () => {
                         onClose={() => setSelectedTask(null)}
                         task={selectedTask}
                         listName={board.lists.find(l => l._id === selectedListId)?.title}
-                        onSave={handleUpdateTask}
+                        onSave={selectedTask._id === 'new' ? handleCreateTaskFromModal : handleUpdateTask}
                         onDelete={handleDeleteTaskFromModal}
                         allLists={board.lists}
                         currentListId={selectedListId}
                         onMove={handleMoveTask}
+                        onCreateSubtask={handleCreateLinkedSubtask}
+                        onTaskLinkClick={handleTaskLinkClick}
                     />
                 )}
             </div>

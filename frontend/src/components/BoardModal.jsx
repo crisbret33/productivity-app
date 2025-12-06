@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const CreateBoardModal = ({ isOpen, onClose, onCreate }) => {
+const BoardModal = ({ isOpen, onClose, onCreate }) => {
     const [title, setTitle] = useState('');
     const [lists, setLists] = useState(['To Do', 'In Progress', 'Done']);
     const [newListInput, setNewListInput] = useState('');
@@ -106,4 +106,4 @@ const CreateBoardModal = ({ isOpen, onClose, onCreate }) => {
     );
 };
 
-export default CreateBoardModal;
+export default BoardModal;

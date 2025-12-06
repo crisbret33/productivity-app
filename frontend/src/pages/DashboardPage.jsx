@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from '../api/axios';
 import { useNavigate } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import CreateBoardModal from '../components/CreateBoardModal';
+import CreateBoardModal from '../components/BoardModal';
 
 const DashboardPage = () => {
     const [boards, setBoards] = useState([]);

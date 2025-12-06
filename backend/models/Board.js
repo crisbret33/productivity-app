@@ -13,6 +13,12 @@ const taskSchema = new Schema({
     assignedTo: { type: Schema.Types.ObjectId, ref: 'User', default: null },
     dueDate: { type: Date, default: null },
     order: { type: Number, required: true },
+    labels: [{
+        color: { type: String },
+        text: { type: String, default: '' }
+    }],
+    parentTaskId: { type: String, default: null },
+    subtaskIds: [{ type: String }],
     comments: [commentSchema]
 }, { 
     _id: true,

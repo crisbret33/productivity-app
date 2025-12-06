@@ -3,7 +3,8 @@ const router = express.Router();
 const { 
     getBoards, createBoard, getBoard, addList, addTask, 
     reorderTasks, deleteTask, reorderLists, deleteList, 
-    deleteBoard, reorderMyBoards, updateTask, moveTask 
+    deleteBoard, reorderMyBoards, updateTask, moveTask,
+    createLinkedSubtask 
 } = require('../controllers/boardController');
 const { protect } = require('../middlewares/authMiddleware');
 
@@ -27,5 +28,6 @@ router.put('/:boardId/lists/:listId/reorder', protect, reorderTasks);
 router.delete('/:boardId/lists/:listId/tasks/:taskId', protect, deleteTask);
 router.put('/:boardId/lists/:listId/tasks/:taskId', protect, updateTask);
 router.put('/:boardId/tasks/:taskId/move', protect, moveTask);
+router.post('/:boardId/tasks/:parentId/subtasks', protect, createLinkedSubtask);
 
 module.exports = router;

@@ -1,27 +1,20 @@
 import { Draggable } from '@hello-pangea/dnd';
 
-const Task = ({ task, index, onClick }) => {
+const Task = ({ task, index, onClick, parentName }) => {
 
     const getBackgroundColor = (isDragging, dueDate) => {
         if (isDragging) return '#e6fcff';
-
         if (!dueDate) return 'white';
-
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-
         const due = new Date(dueDate);
         due.setHours(0, 0, 0, 0);
-
-        if (due < today) {
-            return '#ffe6e6';
-        }
-        if (due.getTime() === today.getTime()) {
-            return '#fff8c4'; 
-        }
-
+        if (due < today) return '#ffe6e6'; 
+        if (due.getTime() === today.getTime()) return '#fff8c4';
         return 'white';
     };
+
+    const isSubtask = task.parentTaskId && task.parentTaskId !== null;
 
     return (
         <Draggable draggableId={task._id} index={index}>
@@ -34,7 +27,6 @@ const Task = ({ task, index, onClick }) => {
                     onClick={onClick}
                     style={{
                         background: getBackgroundColor(snapshot.isDragging, task.dueDate),
-                        
                         padding: '10px 12px',
                         borderRadius: '6px',
                         boxShadow: snapshot.isDragging ? '0 10px 20px rgba(0,0,0,0.15)' : '0 1px 3px rgba(0,0,0,0.1)',
@@ -48,7 +40,31 @@ const Task = ({ task, index, onClick }) => {
                         ...provided.draggableProps.style,
                     }}
                 >
-                    <span style={{ wordBreak: 'break-word', lineHeight: '1.5' }}>
+                    {task.labels && task.labels.length > 0 && (
+                        <div style={{ display: 'flex', gap: '4px', marginBottom: '6px', flexWrap: 'wrap' }}>
+                            {task.labels.map((label, i) => (
+                                <div key={i} style={{ width: '40px', height: '8px', borderRadius: '4px', backgroundColor: label.color }} />
+                            ))}
+                        </div>
+                    )}
+
+                    {isSubtask && (
+                        <div style={{ 
+                            fontSize: '10px', color: '#0079bf', marginBottom: '4px', fontWeight: 'bold', 
+                            display: 'flex', alignItems: 'center', gap: '4px', 
+                            // textTransform: 'uppercase',
+                            background: 'rgba(0, 121, 191, 0.1)', padding: '2px 4px', borderRadius: '3px', width: 'fit-content'
+                        }}>
+                            {parentName || 'Parent Task'}
+                        </div>
+                    )}
+
+                    <span style={{ 
+                        wordBreak: 'break-word', 
+                        lineHeight: '1.5',
+                        fontWeight: isSubtask ? '400' : '700',
+                        color: isSubtask ? '#172b4d' : '#091e42'
+                    }}>
                         {task.title}
                     </span>
                     
@@ -57,11 +73,9 @@ const Task = ({ task, index, onClick }) => {
                             fontSize: '11px', 
                             marginTop: '5px', 
                             color: new Date(task.dueDate).setHours(0,0,0,0) < new Date().setHours(0,0,0,0) ? '#d32f2f' : '#5e6c84',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px'
+                            display: 'flex', alignItems: 'center', gap: '4px'
                         }}>
-                            🕒 {new Date(task.dueDate).toLocaleDateString()}
+                            🕒 {new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                         </div>
                     )}
                 </div>
